@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <style>
+        .fundoVerde{
+            background-color: green;
+            color: white;
+        }
+    </style>
+    
+    <div id="app">
+        <p v-bind:class="{fundoVerde: true}">Minha mensagem: {{message}}</p>
+        <p v-bind:style="{fontSize: size+'px'}" >A soma de 2+2 é: {{2+2}}</p>
+        <img v-bind:src="image" />
+
+        <hr/>
+
+        <button @click="mostrarData = !mostrarData" >{{mostrarData?'Ocultar':'Exibir'}} testes com "data"</button>
+        <button @click="mostrarMethods = !mostrarMethods" >{{mostrarMethods?'Ocultar':'Exibir'}} testes com "methods"</button>
+        <button @click="mostrarForms = !mostrarForms" >{{mostrarMethods?'Ocultar':'Exibir'}} testes com formulários</button>
+
+        <hr/>
+
+        <div v-show="mostrarData">
+
+            <div v-show="exibirEstoque">
+
+                <h2>Produtos em estoque:</h2>
+                <p v-if="estoqueLista.includes('camiseta')" >Camiseta: <strong>em estoque</strong> </p>
+                <p>Calça: <strong v-if="calcaEmEstoque">em estoque</strong><span v-else>Fora de estoque</span></p>
+                <p>
+                    Tênis: 
+                    <strong v-if="estoqueTenis > 0">em estoque ({{estoqueTenis}})</strong>
+                    <span v-else>Fora de estoque</span>
+                    <button v-on:click="estoqueTenis++">Aumentar estoque</button>
+                </p>
+                
+                <p>Meias: 
+                    <strong v-if="estoqueMeia > 5">em estoque</strong>
+                    <span v-else-if="estoqueMeia <= 5 && estoqueMeia > 0"><strong>em estoque</strong> QUASE ACABANDO</span>
+                    <span v-else="estoqueMeia <= 0">Fora de estoque</span>
+                </p>
+
+            </div>
+
+            <div>
+                <h2>Comidas</h2>
+                <ul>
+                    <li v-for="comida in comidas" v-on:click="alert('opa')" > {{comida}} </li>
+                </ul>
+                <h3>Imagens</h3>
+                <div>
+                    <!-- <img v-for="tamanho in tamanhosImagens" v-bind:width="tamanho" src="https://placeholder.co/100" /> -->
+                    <img v-for="tamanho in tamanhosImagens" v-bind:src="'https://placeholder.co/'+tamanho" />
+                </div>
+                <h3>Figuras</h3>
+                <figure v-for="(figura, index) in figuras">
+                    <img v-bind:src="figura.src" />
+                    <figcaption>{{index +". "+ figura.name}}</figcaption>
+                </figure>
+            </div>
+
+            <div>
+                <h2>Contato</h2>
+                
+                <!-- <form v-on:submit="e => e.preventDefault() " > -->
+                <form @submit.prevent="" >
+                    <label>
+                        Digite seu nome:
+                        <br/>
+                        <input type="text" v-on:input="contagemInput += contagemInput >= 10 ? 0 : 1 " />
+                        <br/>
+                        <small>Caracteres digitados: {{contagemInput}}/10 </small>
+                    </label>
+                    <button @click="console.log('uepa')" >Enviar</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div v-show="mostrarMethods">
+            <button @click="mostrarMensagem" >Mostrar mensagem</button>
+
+            <div style="width: 100%; height: 50px; margin-bottom: 20px; color: white" :style="{background: 'hsl('+posicaoMouse[0]+',80%,80%)'}" @mousemove="alteraPosicaoMouse">
+                <p>Passe o mouse para mudar a cor</p>
+            </div>
+
+            <textarea @input="handleText" placeholder="Digite aqui"></textarea>
+            <br/>
+            <span>Texto: {{textoDigitado}}</span>
+
+            <p>Contador: <strong>{{contador}}</strong></p>
+            <button @click="incrementarContador(1)" >Aumentar em 1</button>
+            <button @click="incrementarContador(5)">Aumentar em 5</button>
+            <button @click="incrementarContador(-1)">Reduzir em 1</button>
+            <!-- <p>Aumentar em: <input value="1" :input="contadorPersonalizado = target.value" /> <button @click="contador += contadorPersonalizado" >Executar</button> </p> -->
+
+            <p>Selecione um animal:</p>
+            <ul>
+                <li @click="mostraAnimal($event, 'Que fofinho')" >Golfinho</li>
+                <li @click="mostraAnimal($event, 'Nunca nem vi')">Pinguim</li>
+                <li @click="mostraAnimal($event, 'Imagina o tamanho do cocô...')">Elefante</li>
+            </ul>
+            <p>Golfinhos clicados: {{contaBichos.golfinho}}</p>
+            <p>Pinguins clicados: {{contaBichos.pinguim}}</p>
+            <p>Elefantes clicados: {{contaBichos.elefante}}</p>
+
+            <textarea @keydown.ctrl.s="eventosTeclado" >
+                Atalhos: 
+                enter = Enviar
+                ctrl+s = Salvar
+            </textarea>
+
+        </div>
+
+        <div v-show="mostrarForms">
+            <form @submit.prevent="addItem()" >
+                <input placeholder="Digite uma fruta" type="text" v-model="itemName" />
+                <br/>
+                <small>Binding: {{itemName}}</small>
+                <br/>
+                <input placeholder="Quantidade" type="number" v-model="itemNumber" />
+                <br/>
+                <label><input type="checkbox" v-model="isAdvanced" /> Ver opções avançadas</label>
+                <div v-show="isAdvanced">
+                    <input placeholder="Tamanho da fruta" v-model="itemSize" type="text" />
+                </div>
+                <br/>
+                <button >Enviar</button>
+            </form>
+            <p>Itens da lista:</p>
+            <ul>
+                <li v-for="item in itemList" >{{item.name}}: {{item.number}} <span v-if="item.size != null">- {{item.size}}</span> </li>
+            </ul>
+        </div>
+
+    </div>
+
+    
+
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+    <script src="./vue.global.js"></script>
+
+    <script>
+        const app = Vue.createApp({
+            // Dados e variáveis
+            data(){
+                return{
+                    message: "Hello World",
+                    image: "https://placeholder.co/100",
+                    size: 30,
+                    exibirEstoque: true,
+                    calcaEmEstoque: true,
+                    estoqueTenis: -1,
+                    estoqueMeia: 5,
+                    estoqueLista: "camiseta,calça,tenis,meias",
+                    tamanhoPlacehold: 200,
+                    comidas: ["Pera", "Uva", "Maçã", "Salada mista"],
+                    tamanhosImagens: [50, 100, 200],
+                    figuras: [ {src:"https://placeholder.co/100", name:"Quadrado"}, {src:"https://placeholder.co/200x100", name:"retangulo"} ],
+                    contagemInput: 0,
+                    mostrarData: false,
+                    mostrarMethods: false,
+                    mostrarForms: true,
+                    textoDigitado: "",
+                    posicaoMouse: [0,0],
+                    contador: 0,
+                    contadorPersonalizado: 1,
+                    listaAnimais: ["Golfinho", "Pinguim", "Elefante"],
+                    contaBichos: { pinguim: 0, golfinho: 0, elefante: 0 },
+                    // Forms
+                    itemName: "",
+                    itemNumber: 0,
+                    itemSize: null,
+                    isAdvanced: false,
+                    itemList: [{name: "Maçã", number: 3, size: null}]
+                }
+            },
+            // Funções e métodos
+            methods:{
+                mostrarMensagem(){
+                    alert("Alert não funfaaaa")
+                },
+                handleText(e){
+                    this.textoDigitado = e.target.value;
+                },
+                alteraPosicaoMouse(e){
+                    this.posicaoMouse = [e.offsetX, e.offsetY]
+                },
+                incrementarContador(valor){
+                    this.contador += valor;
+                },
+                mostraAnimal(e, mensagem){ // evento junto de mensagem
+                    alert(mensagem+ " o "+e.target.textContent);
+                    this.contaBichos[e.target.textContent.toLowerCase()] = this.contaBichos[e.target.textContent.toLowerCase()]+1 ;
+                },
+                eventosTeclado(e){
+                    // https://www.w3schools.com/vue/vue_event-modifiers.php
+                },
+                // Forms
+                addItem(){
+                    const item = {
+                        name: this.itemName,
+                        number: this.itemNumber,
+                        size: this.itemSize
+                    }
+                    this.itemList.push(item);
+                    this.itemName = null;
+                    this.itemNumber = null;
+                    this.itemSize = null;
+                    this.isAdvanced = false;
+                }
+            }
+        });
+
+        app.mount("#app")
+
+    </script>
+
+</body>
+</html>
